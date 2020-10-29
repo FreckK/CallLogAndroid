@@ -1,0 +1,16 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Método de visualización">
+
+        <ListPreference
+            app:defaultValue="name"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="visualizationMode"
+            app:title="Ordenar por..."
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

@@ -1,0 +1,12 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="reply_entries">
+        <item>Nombre</item>
+        <item>Orden de llegada</item>
+    </string-array>
+
+    <string-array name="reply_values">
+        <item>name</item>
+        <item>date</item>
+    </string-array>
+</resources>
