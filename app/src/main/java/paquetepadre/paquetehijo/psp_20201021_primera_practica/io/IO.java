@@ -31,18 +31,20 @@ public class IO {
         }
     }
 
-    public static void readFileInternalMemory(File file){
+    public static ArrayList<String> readFileInternalMemory(File file){
+        ArrayList<String> strLines = new ArrayList<String>();
         try {
             String strCurrentLine;
             BufferedReader objReader = new BufferedReader(new FileReader(file));
             while ((strCurrentLine = objReader.readLine()) != null) {
-                Log.d("xyz", "Lo que pone en la linea: " + strCurrentLine);
+                strLines.add(strCurrentLine);
             }
         } catch (FileNotFoundException e) {
             Log.d(ERROR_TAG, e.getMessage());
-        } catch (IOException e) {
-            Log.d(ERROR_TAG, e.getMessage());
+        } catch (IOException ioe) {
+            Log.d(ERROR_TAG, ioe.getMessage());
         }
+        return strLines;
     }
 
     public static void writeFileExternalMemory(File file, Call call){
@@ -50,19 +52,6 @@ public class IO {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
             bw.write(call.toCsvName());
             bw.newLine();
-            bw.close();
-        } catch (IOException ioe){
-            Log.d(ERROR_TAG, ioe.getMessage());
-        }
-    }
-
-    public static void writeCallsSort(File file, ArrayList<Call> calls){
-        try{
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file, false));
-            for (Call call : calls) {
-                bw.write(call.toCsvName());
-                bw.newLine();
-            }
             bw.close();
         } catch (IOException ioe){
             Log.d(ERROR_TAG, ioe.getMessage());
@@ -85,6 +74,19 @@ public class IO {
         return strLines;
     }
 
+    public static void writeCallsSort(File file, ArrayList<Call> calls){
+        try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file, false));
+            for (Call call : calls) {
+                bw.write(call.toCsvName());
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException ioe){
+            Log.d(ERROR_TAG, ioe.getMessage());
+        }
+    }
+
     public static File searchFile(File folder, String fileName){
         File fileOut = null;
         File[] listOfFiles = folder.listFiles();
@@ -104,4 +106,5 @@ public class IO {
         }
         return fileOut;
     }
+
 }

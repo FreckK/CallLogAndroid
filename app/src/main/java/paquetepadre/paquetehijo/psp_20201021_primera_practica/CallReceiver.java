@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.provider.ContactsContract;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 
 
 import java.io.File;
@@ -25,37 +27,44 @@ public class CallReceiver extends BroadcastReceiver {
     private static final String TAG = "xyz";
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        try {
-            String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-            if (state.equalsIgnoreCase(TelephonyManager.EXTRA_STATE_RINGING)){
+    public void onReceive(Context contexto, Intent intento) {
+        final Context context = contexto;
+        final Intent intent = intento;
 
-                String phoneNumber = (String) intent.getExtras().get("incoming_number");
-                Contact contact = ManageCall.lookForContact(phoneNumber, context);
-                if (contact == null){
-                    contact = new Contact(phoneNumber, null);
-                }
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    try {
+                    String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+                    if (state.equalsIgnoreCase(TelephonyManager.EXTRA_STATE_RINGING)){
 
-                //Creamos el archivo si no existe
-                new File(context.getFilesDir().getAbsolutePath() + "/historial.csv").createNewFile();
-                File file = IO.searchFile(context.getFilesDir(), "historial.csv");
-                IO.writeFileInternalMemory(file, new Call(LocalDateTime.now(), contact));
-                IO.readFileInternalMemory(file);
+                        String phoneNumber = (String) intent.getExtras().get("incoming_number");
+                        Contact contact = ManageCall.lookForContact(phoneNumber, context);
+                        if (contact == null){
+                            contact = new Contact(phoneNumber, null);
+                        }
 
-                //Creamos el archivo si no existe
-                new File(context.getExternalFilesDir(null).getAbsolutePath() + "/llamadas.csv").createNewFile();
-                File file2 = IO.searchFile(context.getExternalFilesDir(null), "llamadas.csv");
-                IO.writeFileExternalMemory(file2, new Call(LocalDateTime.now(), contact));
-                IO.readFileExternalMemory(file2);
+                        //Creamos el archivo si no existe
+                        new File(context.getFilesDir().getAbsolutePath() + "/historial.csv").createNewFile();
+                        File file = IO.searchFile(context.getFilesDir(), "historial.csv");
+                        IO.writeFileInternalMemory(file, new Call(LocalDateTime.now(), contact));
+                        IO.readFileInternalMemory(file);
 
-                //Sacamos la info del archivo
-                ArrayList<String> record = IO.readFileExternalMemory(file2);
-                ArrayList<Call> callsRecord = new ArrayList<Call>();
-                if(record.size() != 0){
-                    for (String line : record) {
-                        callsRecord.add(Call.csvToCall(line, Call.ORDER_BY_NAME));
-                    }
-                }
+                        //Creamos el archivo si no existe
+                        new File(context.getExternalFilesDir(null).getAbsolutePath() + "/llamadas.csv").createNewFile();
+                        File file2 = IO.searchFile(context.getExternalFilesDir(null), "llamadas.csv");
+                        IO.writeFileExternalMemory(file2, new Call(LocalDateTime.now(), contact));
+                        IO.readFileExternalMemory(file2);
+
+                        //Sacamos la info del archivo
+                        ArrayList<String> record = IO.readFileExternalMemory(file2);
+                        ArrayList<Call> callsRecord = new ArrayList<Call>();
+                        if(record.size() != 0){
+                            for (String line : record) {
+                                callsRecord.add(Call.csvToCall(line, Call.ORDER_BY_NAME));
+                            }
+                        }
 
                 /* Aqui tenemos un log para ver las llamadas
                 for (Call llamada : callsRecord){
@@ -63,20 +72,23 @@ public class CallReceiver extends BroadcastReceiver {
                 }
                 */
 
-                //Ordenamos el array
-                ArrayList<Call> callsRecordSorted = callsRecord;
-                callsRecordSorted.sort(null);
-                for (Call llamada : callsRecordSorted){
-                    Log.v("xyz", "El toString de la llamada ordenada" + llamada.toString());
+                        //Ordenamos el array
+                        ArrayList<Call> callsRecordSorted = callsRecord;
+                        callsRecordSorted.sort(null);
+                        for (Call llamada : callsRecordSorted){
+                            Log.v("xyz", "El toString de la llamada ordenada" + llamada.toString());
+                        }
+
+                        //Volvemos a escribir el archivo pero ya ordenado
+                        IO.writeCallsSort(IO.searchFile(context.getExternalFilesDir(null), "llamadas.csv"), callsRecordSorted);
+
+                    }
+
+                    } catch (Exception e) {
+                        Log.d(TAG, e.getMessage());
+                    }
                 }
-
-                //Volvemos a escribir el archivo pero ya ordenado
-                IO.writeCallsSort(IO.searchFile(context.getExternalFilesDir(null), "llamadas.csv"), callsRecordSorted);
-
-            }
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
+            }.start();
     }
 
     private static class ManageCall {

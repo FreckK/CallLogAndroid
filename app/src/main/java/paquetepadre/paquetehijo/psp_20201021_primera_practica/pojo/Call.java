@@ -68,9 +68,9 @@ public class Call implements Comparable<Call> {
     public int compareTo(Call call) {
         int result = 0;
         if (this.contact.compareTo(call.contact) < 0){
-            result = -1;
-        }else if(this.contact.compareTo(call.contact) > 0){
             result = 1;
+        }else if(this.contact.compareTo(call.contact) > 0){
+            result = -1;
         }
         return result;
     }

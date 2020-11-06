@@ -22,6 +22,8 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     //Layout elements
     private TextView tvResoults;
+    private ProgressBar pbProgress;
+    private ScrollView scrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelMainActivity(this.getApplicationContext());
         appPermissions();
         initComponents();
-
     }
 
 
@@ -81,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initComponents() {
         tvResoults = findViewById(R.id.tvResoults);
+        pbProgress = findViewById(R.id.pbProgress);
+        scrollView = findViewById(R.id.scrollView);
     }
 
     private void appPermissions() {
